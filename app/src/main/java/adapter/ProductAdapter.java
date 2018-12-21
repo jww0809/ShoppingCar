@@ -1,7 +1,12 @@
 package adapter;
 
+import android.content.ContentValues;
 import android.content.Context;
 
+import android.database.Cursor;
+import android.database.DefaultDatabaseErrorHandler;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +20,13 @@ import java.util.List;
 import bean.Product;
 import jww.com.shoppingcar.R;
 import thred.ImageHttpThred;
+import util.DBUtils;
+import util.DataBaseHelper;
 
 public class ProductAdapter extends ArrayAdapter {
 
     private int resourceId;
+
     public ProductAdapter( Context context, int resource,List objects) {
         super(context, resource, objects);
         resourceId = resource;
@@ -27,7 +35,9 @@ public class ProductAdapter extends ArrayAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-       Product product  = (Product)getItem(position);
+
+        //获取对应位置的数据
+       final Product product  = (Product)getItem(position);
        ProductLayout productLayout = new ProductLayout();
        View view;
 
@@ -48,6 +58,18 @@ public class ProductAdapter extends ArrayAdapter {
        }
        productLayout.titleView.setText(product.getTitle());
        productLayout.priceView.setText(product.getPrice());
+
+       //点击加入购物车
+       productLayout.btnView.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               DBUtils dbUtils = new DBUtils(getContext());
+               dbUtils.addCart(product);
+
+           }
+       });
+
+
        ImageHttpThred imageHttpThred = new ImageHttpThred(product.getImage());
        imageHttpThred.start();
         try {
